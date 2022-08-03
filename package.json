@@ -1,0 +1,16 @@
+{
+  "name": "type-challenges",
+  "version": "1.0.0",
+  "description": "[github/type-challenges](https://github.com/type-challenges/type-challenges)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@type-challenges/utils": "^0.1.1",
+    "typescript": "^4.7.4"
+  }
+}
