@@ -23,8 +23,8 @@
 //   [K in keyof Obj | Key]: K extends keyof Obj ? Obj[K] : Value;
 // };
 
-type IntersectionToObject<T> = { [K in keyof T]: T[K] };
-type AppendToObject<Obj, Key extends PropertyKey, Value> = IntersectionToObject<Obj & Record<Key, Value>>;
+type IntersectionToObject<T> = { [K in keyof T]: T[K] }; // Similar to Omit<T, never>
+type AppendToObject<Obj, Key extends PropertyKey, Value> = Omit<Obj & Record<Key, Value>, never>;
 
 /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from "@type-challenges/utils";

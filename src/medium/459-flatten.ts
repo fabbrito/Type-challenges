@@ -18,21 +18,32 @@
 
 /* _____________ Your Code Here _____________ */
 
-type Flatten<T extends any[], Acc extends any[] = []> = T extends [infer Value, ...infer Tail]
+type FlattenWithAcc<T extends any[], Acc extends any[] = []> = T extends [infer Value, ...infer Tail]
   ? Value extends any[]
-    ? Flatten<[...Value, ...Tail], Acc>
-    : Flatten<Tail, [...Acc, Value]>
+    ? FlattenWithAcc<[...Value, ...Tail], Acc>
+    : FlattenWithAcc<Tail, [...Acc, Value]>
   : Acc;
+
+type Flatten<T extends any | any[]> = T extends []
+  ? T
+  : T extends [infer V, ...infer R]
+    ? [...Flatten<V>, ...Flatten<R>]
+    : [T];
 
 /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from "@type-challenges/utils";
 
 type cases = [
-  Expect<Equal<Flatten<[]>, []>>,
+  Expect<Equal<Flatten<[1]>, [1]>>,
   Expect<Equal<Flatten<[1, 2, 3, 4]>, [1, 2, 3, 4]>>,
   Expect<Equal<Flatten<[1, [2]]>, [1, 2]>>,
   Expect<Equal<Flatten<[1, 2, [3, 4], [[[5]]]]>, [1, 2, 3, 4, 5]>>,
-  Expect<Equal<Flatten<[{ foo: "bar"; 2: 10 }, "foobar"]>, [{ foo: "bar"; 2: 10 }, "foobar"]>>
+  Expect<Equal<Flatten<[{ foo: "bar"; 2: 10 }, "foobar"]>, [{ foo: "bar"; 2: 10 }, "foobar"]>>,
+  Expect<Equal<FlattenWithAcc<[]>, []>>,
+  Expect<Equal<FlattenWithAcc<[1, 2, 3, 4]>, [1, 2, 3, 4]>>,
+  Expect<Equal<FlattenWithAcc<[1, [2]]>, [1, 2]>>,
+  Expect<Equal<FlattenWithAcc<[1, 2, [3, 4], [[[5]]]]>, [1, 2, 3, 4, 5]>>,
+  Expect<Equal<FlattenWithAcc<[{ foo: "bar"; 2: 10 }, "foobar"]>, [{ foo: "bar"; 2: 10 }, "foobar"]>>
 ];
 
 /* _____________ Further Steps _____________ */
