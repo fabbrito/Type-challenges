@@ -25,9 +25,9 @@
 type S1<T> = [T] extends [never] ? never : [T];
 type S2<T> = T extends [never] ? never : [T];
 type NotEqual<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? false : true;
-type IsUnion<T> = NotEqual<S1<T>, S2<T>>;
+type IsUnionUsingNotEqual<T> = NotEqual<S1<T>, S2<T>>;
 
-// type IsUnion<T, B = T> = T extends B ? ([B] extends [T] ? false : true) : never;
+type IsUnion<T, C extends T = T> = (T extends T ? (C extends T ? true : unknown) : never) extends true ? false : true;
 
 /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from "@type-challenges/utils";

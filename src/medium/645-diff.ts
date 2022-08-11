@@ -21,7 +21,7 @@
 }; */
 
 // From https://github.com/type-challenges/type-challenges/issues/3014
-//Omit the keys of the intersection from the union of the objects
+// Omit, from the union of the objects, the keys of the intersection
 // First & Second => union
 // First | Second => intersection
 type Diff<First, Second> = Omit<First & Second, keyof (First | Second)>;

@@ -18,6 +18,15 @@
 */
 
 /* _____________ Your Code Here _____________ */
+
+/* // My solution for small numbers:
+type NumberToArray<N extends number, U extends number[] = []> = U["length"] extends N
+  ? U
+  : NumberToArray<N, [U["length"], ...U]>;
+type MinusOne<N extends number> = NumberToArray<N>[0];
+*/
+
+
 // Lookup table to seed the counting array
 // Skips to length of 10, 100, 1000 instead of counting
 // Allows going up to 1998 instead of 999!
@@ -62,7 +71,7 @@ type MinusOne<T extends number, U extends any[] = []> =
   // Fail if higher than 9999 (It fails for other reasons anyways)
   never;
 
-/*
+
 type Zero = MinusOne<1>;
 type A = MinusOne<2>;
 type B = MinusOne<20>;
@@ -73,7 +82,6 @@ type F = MinusOne<1004>;
 type G = MinusOne<1026>;
 type H = MinusOne<1006>;
 type I = MinusOne<1998>; // Works up to 1998!
- */
 
 
 /* _____________ Test Cases _____________ */
