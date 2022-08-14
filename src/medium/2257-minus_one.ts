@@ -19,7 +19,7 @@
 
 /* _____________ Your Code Here _____________ */
 
-/* // My solution for small numbers:
+/* //* My solution for small numbers:
 type NumberToArray<N extends number, U extends number[] = []> = U["length"] extends N
   ? U
   : NumberToArray<N, [U["length"], ...U]>;

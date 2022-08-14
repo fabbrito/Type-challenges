@@ -22,8 +22,6 @@ type Combination<T extends string[], A extends string = T[number], U extends str
   ? U | `${U} ${Combination<[], Exclude<A, U>>}`
   : never;
 
-
-
 /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from "@type-challenges/utils";
 

@@ -37,7 +37,6 @@ type RequiredByKeysWithInfer<T, U = keyof T> = Omit<
 >;
 type RequiredByKeysBuiltIn<T, U = keyof T> = Omit<T & Required<Pick<T, U & keyof T>>, never>;
 
-type A = RequiredByKeys<User, "name">;
 /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from "@type-challenges/utils";
 
