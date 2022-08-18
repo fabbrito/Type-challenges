@@ -19,11 +19,19 @@
 
 /* _____________ Your Code Here _____________ */
 
+// String2Array<S>: Converts a string to an array of its chars
+// Sample: type S0 = String2Array<"abc">; // ["a", "b", "c"]
 type String2Array<S extends string, Acc extends string[] = []> = S extends `${infer Char}${infer Rest}`
   ? String2Array<Rest, [...Acc, Char]>
   : Acc;
 
-type IsPalindrome<T extends string | number | bigint, A = String2Array<`${T}`>> = A extends [infer F, ...infer M, infer L]
+// IsPalindrome<S>: Converts the string to an array, then checks if the first and last element match and repeats the checks for the middle of the array.
+//                  If any mismatch happens, returs false, otherwise, true.
+type IsPalindrome<S extends string | number | bigint, A = String2Array<`${S}`>> = A extends [
+  infer F,
+  ...infer M,
+  infer L
+]
   ? F extends L
     ? IsPalindrome<never, M>
     : false
