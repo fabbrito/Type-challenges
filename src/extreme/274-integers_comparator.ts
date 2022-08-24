@@ -18,56 +18,77 @@
 
 /* _____________ Your Code Here _____________ */
 
-enum Comparison {
+/* // * My Solution for small numbers
+// Compares A and B, both positive numbers, and returns if A is Greater, Equal or Lower when compared to B
+type ComparatorPositiveNumbers<
+A extends string | number,
+B extends string | number,
+Count extends 1[] = []
+> = A extends B
+? Comparison.Equal
+: `${Count["length"]}` extends `${A}`
+? Comparison.Lower
+: `${Count["length"]}` extends `${B}`
+  ? Comparison.Greater
+  : ComparatorPositiveNumbers<A, B, [...Count, 1]>;
+
+  type Comparator<A extends number, B extends number> = `${A}` extends `-${infer AbsA}`
+  ? `${B}` extends `-${infer AbsB}`
+  ? // A < 0 and B < 0 => Use ComparatorPositiveNumbers, but with inverted absolute values of A and B
+  // Proof: |A| = |B| => Equal, |A| > |B| => A < B, |A| < |B| => A > B
+  ComparatorPositiveNumbers<AbsB, AbsA>
+  : // A < 0 and B >= 0 => A < B
+  Comparison.Lower
+  : `${B}` extends `-${number}`
+  ? // A >= 0 and B < 0 => A > B
+  Comparison.Greater
+  : // A >= 0 and B >= 0 => Use ComparatorPositiveNumbers<A, B>
+  ComparatorPositiveNumbers<A, B>;
+  */
+
+// Main "Comparator" solution from https://github.com/type-challenges/type-challenges/issues/11444
+export enum Comparison {
   Greater,
   Equal,
   Lower,
 }
 
-/* // * My Solution for small numbers
-// Compares A and B, both positive numbers, and returns if A is Greater, Equal or Lower when compared to B
-type ComparatorPositiveNumbers<
-  A extends string | number,
-  B extends string | number,
-  Count extends 1[] = []
-> = A extends B
-  ? Comparison.Equal
-  : `${Count["length"]}` extends `${A}`
-  ? Comparison.Lower
-  : `${Count["length"]}` extends `${B}`
-  ? Comparison.Greater
-  : ComparatorPositiveNumbers<A, B, [...Count, 1]>;
+// ClearLeftZeros<S>: Removes the zeros at left most digits of S
+// Sample: type TCLZ0 = ClearLeftZeros<"0000001010">; // "1010"
+type ClearLeftZeros<S extends string> = S extends `0${infer R}` ? ClearLeftZeros<R> : S;
 
-type Comparator<A extends number, B extends number> = `${A}` extends `-${infer AbsA}`
+// Comparator<A, B>: Computes if A is Greater, Equal or Lower than B
+export type Comparator<
+  A extends number | bigint | string,
+  B extends number | bigint | string
+> = `${A}` extends `-${infer AbsA}`
   ? `${B}` extends `-${infer AbsB}`
-    ? // A < 0 and B < 0 => Use ComparatorPositiveNumbers, but with inverted absolute values of A and B
-      // Proof: |A| = |B| => Equal, |A| > |B| => A < B, |A| < |B| => A > B
-      ComparatorPositiveNumbers<AbsB, AbsA>
+    ? // A < 0 and B < 0:
+      // ... |B| < |A| => A < B
+      // ... |B| = |A| => A = B
+      // ... |B| > |A| => A > B
+      ComparePositives<ClearLeftZeros<AbsB>, ClearLeftZeros<AbsA>>
     : // A < 0 and B >= 0 => A < B
       Comparison.Lower
   : `${B}` extends `-${number}`
-  ? // A >= 0 and B < 0 => A > B
+  ? // A >=0 and B < 0 => A > B
     Comparison.Greater
-  : // A >= 0 and B >= 0 => Use ComparatorPositiveNumbers<A, B>
-    ComparatorPositiveNumbers<A, B>;
-*/
+  : // A >= 0 and B >= 0
+    ComparePositives<ClearLeftZeros<`${A}`>, ClearLeftZeros<`${B}`>>;
 
-// * From https://github.com/type-challenges/type-challenges/issues/11444
-type Comparator<A extends number, B extends number> = `${A}` extends `-${infer AbsA}`
-  ? `${B}` extends `-${infer AbsB}`
-    ? ComparePositives<AbsB, AbsA>
-    : Comparison.Lower
-  : `${B}` extends `-${number}`
-  ? Comparison.Greater
-  : ComparePositives<`${A}`, `${B}`>;
-
-type ComparePositives<
+// ComparePositives<A, B>
+// Compare the two numbers by length, if one has more digits than the other, then it must be greater.
+// If the length of A and B match, then compare each digit of A to each digit of B to determine which number is greater/lower.
+export type ComparePositives<
   A extends string,
   B extends string,
   ByLength = CompareByLength<A, B>
 > = ByLength extends Comparison.Equal ? CompareByDigits<A, B> : ByLength;
 
-type CompareByLength<A extends string, B extends string> = A extends `${infer AF}${infer AR}`
+// CompareByLength<A, B>
+// Starting from the left-most digit, keeps removing a digit from both numbers until this operation is no longer possible for any of the numbers.
+// When the operation is no longer possible only for one of the numbers, that number is smaller (by length) and also lower (by value).
+export type CompareByLength<A extends string, B extends string> = A extends `${infer AF}${infer AR}`
   ? B extends `${infer BF}${infer BR}`
     ? CompareByLength<AR, BR>
     : Comparison.Greater
@@ -75,7 +96,10 @@ type CompareByLength<A extends string, B extends string> = A extends `${infer AF
   ? Comparison.Lower
   : Comparison.Equal;
 
-type CompareByDigits<
+// CompareByDigits<A, B>: when this is called, the numbers match in length.
+// Starting from the left-most digit, compares each digit on the same position for both of the numbers.
+// If the two digits are equal, continue to the next digit. Else, the result for comparison of numbers can be inferred from the result of the comparison between digits.
+export type CompareByDigits<
   A extends string,
   B extends string
 > = `${A}|${B}` extends `${infer AF}${infer AR}|${infer BF}${infer BR}`
@@ -84,9 +108,10 @@ type CompareByDigits<
     : CompareDigits<AF, BF>
   : Comparison.Equal;
 
-type CompareDigits<A extends string, B extends string> = A extends B
+// CompareDigits<DA, DB>: Returns if DA is Greater, Equal or Lower than DB
+export type CompareDigits<DA extends string, DB extends string> = DA extends DB
   ? Comparison.Equal
-  : "0123456789" extends `${string}${A}${string}${B}${string}`
+  : "0123456789" extends `${string}${DA}${string}${DB}${string}`
   ? Comparison.Lower
   : Comparison.Greater;
 
@@ -110,7 +135,10 @@ type cases = [
   Expect<Equal<Comparator<40, 37>, Comparison.Greater>>,
   Expect<Equal<Comparator<-36, 36>, Comparison.Lower>>,
   Expect<Equal<Comparator<27, 27>, Comparison.Equal>>,
-  Expect<Equal<Comparator<-38, -38>, Comparison.Equal>>
+  Expect<Equal<Comparator<-38, -38>, Comparison.Equal>>,
+  Expect<Equal<Comparator<"1000", 1_000n>, Comparison.Equal>>,
+  Expect<Equal<Comparator<-10, "10">, Comparison.Lower>>,
+  Expect<Equal<Comparator<10, "00010">, Comparison.Equal>>
 ];
 
 /* _____________ Further Steps _____________ */
